@@ -73,7 +73,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
-
   # Red Hat Quay (for web UI and image management)
   quay:
     image: quay.io/projectquay/quay:latest
@@ -93,8 +92,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: 512M
+          cpus: '2.0'
+          memory: 2G
 
 volumes:
   quay-postgres-data:
