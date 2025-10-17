@@ -93,7 +93,7 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2G
+          memory: 6G
 
 volumes:
   quay-postgres-data:
