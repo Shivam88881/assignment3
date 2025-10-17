@@ -1,17 +1,15 @@
-http_listen_addr: ":6060"
-introspection_addr: ":6061"
-log_level: info
-indexer:
-  connstring: "postgresql://clair:clair6000@clair-postgres:5432/clair6000?sslmode=disable"
-  scanlock_retry: 10
-  layer_scan_concurrency: 2
-  migrations: true
-matcher:
-  connstring: "postgresql://clair:clair6000@clair-postgres:5432/clair6000?sslmode=disable"
-  max_conn_pool: 50
-  migrations: true
-notifier:
-  connstring: "postgresql://clair:clair6000@clair-postgres:5432/clair6000?sslmode=disable"
-  delivery_interval: 1m
-  poll_interval: 5m
-  migrations: true
+clair:
+  database:
+    type: pgsql
+    options:
+      source: host=postgres port=5432 user=postgres password=password dbname=clair sslmode=disable
+      cachesize: 16384
+  api:
+    port: 6060
+    healthport: 6061
+    timeout: 900s
+  updater:
+    interval: 2h
+  notifier:
+    attempts: 3
+    renotifyinterval: 2h

@@ -1,0 +1,35 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:11
+    container_name: clair-postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: clair
+    volumes:
+      - clair-db:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  clair:
+    image: quay.io/coreos/clair:v2.1.8
+    container_name: clair
+    ports:
+      - "6060:6060"
+      - "6061:6061"
+    depends_on:
+      - postgres
+    volumes:
+      - ./clair-config:/config
+    command: -config=/config/config.yaml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  clair-db:
