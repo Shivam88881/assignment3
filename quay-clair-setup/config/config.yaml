@@ -1,0 +1,9 @@
+http_listen_addr: 0.0.0.0:6063
+notifier:
+  http_listen_addr: 0.0.0.0:6061
+indexer:
+  connstring: host=clair6000 port=5432 dbname=clair6000 user=clairuser password=clairpass sslmode=disable
+matcher:
+  connstring: host=clair6000 port=5432 dbname=clair6000 user=clairuser password=clairpass sslmode=disable
+updater:
+  connstring: host=clair6000 port=5432 dbname=clair6000 user=clairuser password=clairpass sslmode=disable

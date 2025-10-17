@@ -1,0 +1,104 @@
+services:
+  # PostgreSQL for Quay
+  quay-postgres:
+    image: postgres:13-alpine
+    container_name: quay-postgres
+    environment:
+      POSTGRES_USER: quayuser
+      POSTGRES_PASSWORD: quaypass
+      POSTGRES_DB: quay
+    volumes:
+      - quay-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - quay-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # PostgreSQL for Clair (as per requirement B - clair6000 database)
+  clair-postgres:
+    image: postgres:13-alpine
+    container_name: clair-postgres
+    environment:
+      POSTGRES_USER: clair
+      POSTGRES_PASSWORD: clair6000
+      POSTGRES_DB: clair6000
+    volumes:
+      - clair-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - quay-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Redis for Quay (required for build logs and user events)
+  redis:
+    image: redis:7-alpine
+    container_name: quay-redis
+    restart: unless-stopped
+    networks:
+      - quay-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+
+  # Clair Security Scanner (requirement A & C)
+  clair:
+    image: quay.io/projectquay/clair:4.7.4
+    container_name: clair
+    ports:
+      - "6063:6060"
+      - "6061:6061"  # Health check
+    restart: unless-stopped
+    depends_on:
+      - clair-postgres
+    environment:
+      - CLAIR_CONF=/config/config.yaml
+      - CLAIR_MODE=combo
+    volumes:
+      - ./clair-config:/config:ro
+    networks:
+      - quay-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Red Hat Quay (for web UI and image management)
+  quay:
+    image: quay.io/projectquay/quay:latest
+    container_name: quay
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - quay-postgres
+      - redis
+      - clair
+    volumes:
+      - ./quay-config:/conf/stack:Z
+      - ./quay-storage:/datastorage:Z
+    networks:
+      - quay-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+volumes:
+  quay-postgres-data:
+  clair-postgres-data:
+
+networks:
+  quay-network:
+    driver: bridge
