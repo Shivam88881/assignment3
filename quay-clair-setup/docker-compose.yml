@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: quay
     volumes:
       - quay-postgres-data:/var/lib/postgresql/data
-        - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     restart: unless-stopped
     networks:
       - quay-network
